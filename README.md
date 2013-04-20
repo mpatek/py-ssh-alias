@@ -21,7 +21,7 @@ Command line usage:
                                   [--id-file=<idfile>]
                                   [--host=<host>]
                                   [--config-file=<config_file>]
-      ssh_alias.py rm <alias> [--config-file=<config_file>]```
+      ssh_alias.py rm <alias> [--config-file=<config_file>]
 
     Options:
       --user=<user>                Username [default: root].
