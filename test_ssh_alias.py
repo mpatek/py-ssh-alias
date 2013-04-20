@@ -8,17 +8,17 @@ def test_read_host_config():
     Test the read_host_config function.
     """
     lines = [
-            'Host foo',
-            ' HostName foo.example.com',
-            ' Port 23',
-            ' User foouser',
-            '',
-            'host bar',
-            ' hostname bar.example.com',
-            ' port 24',
-            ' user baruser',
-            ' identityfile ~/.ssh/bar.key',
-            ]
+        'Host foo',
+        ' HostName foo.example.com',
+        ' Port 23',
+        ' User foouser',
+        '',
+        'host bar',
+        ' hostname bar.example.com',
+        ' port 24',
+        ' user baruser',
+        ' identityfile ~/.ssh/bar.key',
+    ]
     tf = NamedTemporaryFile(delete=False)
     for line in lines:
         tf.write("{0}\n".format(line))
@@ -39,21 +39,21 @@ def test_read_host_config():
 def test_write_host_config():
     """ Test the write_host_config function. """
     lines = [
-            'Host foo',
-            ' HostName foo.example.com',
-            ' Port 23',
-            ' User foouser',
-            ]
+        'Host foo',
+        ' HostName foo.example.com',
+        ' Port 23',
+        ' User foouser',
+    ]
     tf = NamedTemporaryFile(delete=False)
     for line in lines:
         tf.write("{0}\n".format(line))
     tf.close()
     new_foo = {
-            'hostname': 'newfoo.example.com',
-            'port': '24',
-            'user': 'newfoouser',
-            'identityfile': 'newidfile',
-            }
+        'hostname': 'newfoo.example.com',
+        'port': '24',
+        'user': 'newfoouser',
+        'identityfile': 'newidfile',
+    }
     write_host_config('foo', new_foo, tf.name)
     lines = [ln.rstrip() for ln in open(tf.name)]
     assert len(lines) == 5
@@ -63,10 +63,10 @@ def test_write_host_config():
     assert ' port 24' in lines[1:]
     assert ' identityfile newidfile' in lines[1:]
     bar = {
-            'hostname': 'bar.example.com',
-            'port': '25',
-            'user': 'baruser',
-            }
+        'hostname': 'bar.example.com',
+        'port': '25',
+        'user': 'baruser',
+    }
     write_host_config('bar', bar, tf.name)
     lines = [ln.rstrip() for ln in open(tf.name)]
     assert len(lines) == 10
@@ -82,17 +82,17 @@ def test_delete_host_config():
     Test the delete_host_config function.
     """
     lines = [
-            'Host foo',
-            ' HostName foo.example.com',
-            ' Port 23',
-            ' User foouser',
-            '',
-            'host bar',
-            ' hostname bar.example.com',
-            ' port 24',
-            ' user baruser',
-            ' identityfile ~/.ssh/bar.key',
-            ]
+        'Host foo',
+        ' HostName foo.example.com',
+        ' Port 23',
+        ' User foouser',
+        '',
+        'host bar',
+        ' hostname bar.example.com',
+        ' port 24',
+        ' user baruser',
+        ' identityfile ~/.ssh/bar.key',
+    ]
     tf = NamedTemporaryFile(delete=False)
     for line in lines:
         tf.write("{0}\n".format(line))
@@ -105,8 +105,3 @@ def test_delete_host_config():
     assert lines[2] == ' port 24'
     assert lines[3] == ' user baruser'
     assert lines[4] == ' identityfile ~/.ssh/bar.key'
-
-
-if __name__ == "__main__":
-    arguments = docopt(__doc__)
-    print arguments
