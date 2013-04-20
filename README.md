@@ -5,6 +5,7 @@ SSH Alias Management in Python
 
 Installation:
 
+    $ pip install docopt
     $ git clone https://github/mpatek/py-ssh-alias
     $ cd py-ssh-alias
     $ python setup.py install
