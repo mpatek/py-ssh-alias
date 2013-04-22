@@ -12,6 +12,8 @@ Usage:
                               [--host=<host>]
                               [--config-file=<config_file>]
   ssh_alias.py rm <alias> [--config-file=<config_file>]
+  ssh_alias.py list
+  ssh_alias.py view <alias>
 
 Options:
   --user=<user>                Username [default: root].
@@ -25,26 +27,47 @@ import os
 import sys
 
 
-def read_host_config(host, config_file):
+def read_host_configs(config_file):
+    """ Reads all host configurations from specified file.
+
+    Returns dict from aliases to configuration details.
     """
-    Returns list of host configurations.
-    """
+    host_configs = {}
     in_host_config = False
-    config = None
+    curr_config = None
+    curr_alias = None
     for line in open(config_file):
         tokens = line.strip().split()
         if tokens:
             first_token = tokens[0].lower()
             if not in_host_config:
-                if first_token == 'host' and tokens[1] == host:
+                if first_token == 'host':
                     in_host_config = True
-                    config = {}
+                    curr_config = {}
+                    curr_alias = tokens[1]
             else:
-                config[first_token] = ' '.join(tokens[1:])
+                curr_config[first_token] = ' '.join(tokens[1:])
         elif in_host_config:
             in_host_config = False
+            if curr_config and curr_alias:
+                host_configs[curr_alias] = curr_config
+                curr_config = None
+                curr_alias = None
+    if in_host_config and curr_config and curr_alias:
+        host_configs[curr_alias] = curr_config
+        curr_config = None
+        curr_alias = None
+    return host_configs
 
-    return config
+
+def read_host_config(host, config_file):
+    """
+    Returns list of host configurations.
+    """
+    configs = read_host_configs(config_file)
+    if host in configs:
+        return configs[host]
+    return None
 
 
 def fetch_other_lines(host, config_file):
@@ -98,7 +121,10 @@ if __name__ == "__main__":
     config_file = os.path.expanduser(arguments['--config-file'])
     if not os.path.exists(config_file):
         open(config_file, 'w').close()
-    curr_config = read_host_config(alias, config_file)
+    if alias:
+        curr_config = read_host_config(alias, config_file)
+    else:
+        curr_config = None
     if arguments['add']:
         if curr_config:
             sys.stderr.write('Alias {0} already exists!\n'.format(alias))
@@ -131,3 +157,16 @@ if __name__ == "__main__":
             sys.stderr.write('Alias {0} does not exist!\n'.format(alias))
             sys.exit(3)
         delete_host_config(alias, config_file)
+    elif arguments['list']:
+        for alias, config in read_host_configs(config_file).items():
+            print("{0}\t{1}@{2}".format(
+                alias,
+                config['user'],
+                config['hostname'],
+            ))
+    elif arguments['view']:
+        if curr_config:
+            print("alias: {0}".format(alias))
+            for k, v in curr_config.items():
+                print("  {0}: {1}".format(k, v))
+        

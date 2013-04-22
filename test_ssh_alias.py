@@ -1,6 +1,48 @@
-from ssh_alias import read_host_config, write_host_config, delete_host_config
+from ssh_alias import (
+        read_host_config,
+        read_host_configs,
+        write_host_config,
+        delete_host_config,
+        )
 import os
 from tempfile import NamedTemporaryFile
+
+
+def test_read_host_configs():
+    """
+    Test the read_host_configs function.
+    """
+    lines = [
+        'Host foo',
+        ' HostName foo.example.com',
+        ' Port 23',
+        ' User foouser',
+        '',
+        'host bar',
+        ' hostname bar.example.com',
+        ' port 24',
+        ' user baruser',
+        ' identityfile ~/.ssh/bar.key',
+    ]
+    tf = NamedTemporaryFile(delete=False)
+    for line in lines:
+        tf.write("{0}\n".format(line))
+    tf.close()
+    configs = read_host_configs(tf.name)
+    assert len(configs) == 2
+    assert 'foo' in configs
+    foo_config = configs['foo']
+    assert foo_config['hostname'] == 'foo.example.com'
+    assert foo_config['port'] == '23'
+    assert foo_config['user'] == 'foouser'
+    assert 'identityfile' not in foo_config
+    assert 'bar' in configs
+    bar_config = configs['bar']
+    assert bar_config['hostname'] == 'bar.example.com'
+    assert bar_config['port'] == '24'
+    assert bar_config['user'] == 'baruser'
+    assert bar_config['identityfile'] == '~/.ssh/bar.key'
+    os.remove(tf.name)
 
 
 def test_read_host_config():
